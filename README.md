@@ -4,11 +4,12 @@
 Backup GitHub repositories
 
 Usage:
-  github-backup [-t github-access-token] -d DIR
+  github-backup [-t github-access-token] [-a] -d DIR
 
 Options:
   -d DIR     Backup directory
   -t TOKEN   Github Access Token, env: GITHUB_ACCESS_TOKEN
+  -a         Backup all repos (not only own repos), default: false
 
 ```
 
