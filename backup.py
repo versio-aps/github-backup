@@ -3,11 +3,12 @@
 Backup GitHub repositories
 
 Usage:
-  github-backup [-t github-access-token] -d DIR
+  github-backup [-t github-access-token] [-a] -d DIR
 
 Options:
   -d DIR     Backup directory
   -t TOKEN   Github Access Token, env: GITHUB_ACCESS_TOKEN
+  -a         Backup all repos (not only own repos), default: false
 """
 
 from __future__ import print_function
@@ -83,6 +84,7 @@ def main():
 
     dir = args['-d']
     token = args['-t']
+    all_repos = args['-a']
 
     if token is None:
         token = os.getenv("GITHUB_ACCESS_TOKEN")
@@ -101,7 +103,7 @@ def main():
             owner = check_name(repo["owner"]["login"])
             clone_url = repo["clone_url"]
 
-            if owner != user['login']:
+            if not all_repos and owner != user['login']:
                 continue
 
             owner_path = os.path.join(path, owner)
