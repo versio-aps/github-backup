@@ -64,5 +64,3 @@ Run docker images, mounting the local github dir into the container
 docker run -v $PWD/github:/app/repos --rm -it -e GITHUB_ACCESS_TOKEN=ADD_TOKEN_HERE github-backup
 ```
 
-## Configuring
-
