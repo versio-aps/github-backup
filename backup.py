@@ -1,3 +1,15 @@
+#!/usr/bin/env python
+"""
+Backup GitHub repositories
+
+Usage:
+  github-backup [-t github-access-token] -d DIR
+
+Options:
+  -d DIR     Backup directory
+  -t TOKEN   Github Access Token, env: GITHUB_ACCESS_TOKEN
+"""
+
 from __future__ import print_function
 
 import os
@@ -6,9 +18,11 @@ import sys
 import json
 import errno
 import argparse
-import urlparse
+from urllib import parse
 import requests
 import subprocess
+
+from docopt import docopt
 
 
 def get_json(url, token):
@@ -32,7 +46,7 @@ def check_name(name):
 
 def mkdir(path):
     try:
-        os.makedirs(path, 0770)
+        os.makedirs(path, 0o770)
     except OSError as ose:
         if ose.errno != errno.EEXIST:
             raise
@@ -41,14 +55,14 @@ def mkdir(path):
 
 
 def mirror(repo_name, repo_url, to_path, username, token):
-    parsed = urlparse.urlparse(repo_url)
+    parsed = parse.urlparse(repo_url)
     modified = list(parsed)
     modified[1] = "{username}:{token}@{netloc}".format(
         username=username,
         token=token,
         netloc=parsed.netloc
     )
-    repo_url = urlparse.urlunparse(modified)
+    repo_url = parse.urlunparse(modified)
 
     repo_path = os.path.join(to_path, repo_name)
     mkdir(repo_path)
@@ -65,15 +79,18 @@ def mirror(repo_name, repo_url, to_path, username, token):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Backup GitHub repositories")
-    parser.add_argument("config", metavar="CONFIG", help="a configuration file")
-    args = parser.parse_args()
+    args = docopt(__doc__, version='0.0.1')
 
-    with open(args.config, "rb") as f:
-        config = json.loads(f.read())
+    dir = args['-d']
+    token = args['-t']
 
-    token = config["token"]
-    path = os.path.expanduser(config["directory"])
+    if token is None:
+        token = os.getenv("GITHUB_ACCESS_TOKEN")
+        if token is None:
+            print("GITHUB_ACCESS_TOKEN must be assigned")
+            exit(-1)
+
+    path = os.path.expanduser(dir)
     if mkdir(path):
         print("Created directory {0}".format(path), file=sys.stderr)
 
@@ -83,6 +100,9 @@ def main():
             name = check_name(repo["name"])
             owner = check_name(repo["owner"]["login"])
             clone_url = repo["clone_url"]
+
+            if owner != user['login']:
+                continue
 
             owner_path = os.path.join(path, owner)
             mkdir(owner_path)

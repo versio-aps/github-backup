@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  github-backup:
+    image: github-backup:latest
+    build:
+      context: .
+    environment:
+      GITHUB_ACCESS_TOKEN: ADD_TOKEN_HERE
+    volumes:
+      - CHANGE_ME:/app/repos

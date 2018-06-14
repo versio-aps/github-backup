@@ -1,5 +1,17 @@
 # GitHub backup script
 
+```
+Backup GitHub repositories
+
+Usage:
+  github-backup [-t github-access-token] -d DIR
+
+Options:
+  -d DIR     Backup directory
+  -t TOKEN   Github Access Token, env: GITHUB_ACCESS_TOKEN
+
+```
+
 This directory contains a script, ```backup.py```, for backing up GitHub repositories.
 
 The script requires a GitHub token and a destination directory. It then uses the token to populate the destination directory with clones of all the repositories the token can access.
@@ -13,8 +25,6 @@ Install the required Python dependencies using ```pip```:
 ```
 $ pip install -r requirements.txt
 ```
-
-## Configuring
 
 ### Create a token
 
@@ -34,23 +44,25 @@ After clicking the **Generate token** button you're presented with the generated
 
 In the next example let's assume your token is ```6b86190dd45c57c1a1b039a5a54d892e019102f7``` as in the above image.
 
-### Create a configuration file
-
-To run the script you need a JSON configuration file. For an example see the included file ```config.json.example```.
-
-As an example let's create a file, ```config.json```. This file should contain the token we just created and the destination directory where we want to back up the repositories:
-
-```
-{
-    "token": "6b86190dd45c57c1a1b039a5a54d892e019102f7",
-    "directory": "~/backups/github.com"
-}
-```
-
 ## Running
 
 After preparing the token and the configuration file you now can run the script:
 
 ```
-$ python backup.py config.json
+$ python backup.py -t <ACCESS_TOKEN> -d github 
 ```
+
+## Running with Docker
+
+Build image
+```bash
+docker build . -t github-backup 
+```
+
+Run docker images, mounting the local github dir into the container
+```bash
+docker run -v $PWD/github:/app/repos --rm -it -e GITHUB_ACCESS_TOKEN=ADD_TOKEN_HERE github-backup
+```
+
+## Configuring
+
